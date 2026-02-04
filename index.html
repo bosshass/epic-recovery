@@ -59,6 +59,88 @@
     }
     .hero-btn:hover { background: #ff5252; }
     
+    /* Benefits Section */
+    .benefits {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      padding: 60px 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .benefit-card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+    }
+    .benefit-icon { font-size: 36px; margin-bottom: 12px; }
+    .benefit-card h3 { margin-bottom: 8px; font-size: 16px; }
+    .benefit-card p { color: #888; font-size: 13px; }
+    
+    /* Pricing */
+    .pricing-header {
+      text-align: center;
+      padding: 40px 20px 20px;
+    }
+    .pricing-header h1 { font-size: 32px; margin-bottom: 8px; }
+    .pricing-header p { color: #888; }
+    
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      padding: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .price-card {
+      background: #111;
+      border: 2px solid #222;
+      border-radius: 16px;
+      padding: 28px 20px;
+      text-align: center;
+    }
+    .price-card.featured { border-color: #ff6b6b; background: #1a1111; }
+    .price-card .badge {
+      background: #ff6b6b;
+      color: #fff;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+    .price-card h2 { font-size: 22px; margin-bottom: 8px; }
+    .price-card .price { font-size: 40px; font-weight: 700; color: #ff6b6b; }
+    .price-card .price span { font-size: 14px; color: #888; font-weight: normal; }
+    .price-card .desc { color: #888; margin: 12px 0; font-size: 13px; }
+    .tier-features { list-style: none; text-align: left; margin: 20px 0; }
+    .tier-features li { padding: 6px 0; color: #ccc; font-size: 13px; }
+    .tier-features li::before { content: "✓"; color: #ff6b6b; margin-right: 8px; }
+    .price-card button {
+      width: 100%;
+      padding: 12px;
+      background: #ff6b6b;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .price-card button:hover { background: #ff5252; }
+    
+    .epic-link {
+      text-align: center;
+      padding: 20px;
+      color: #888;
+      font-size: 14px;
+    }
+    .epic-link a { color: #ff6b6b; cursor: pointer; }
+    
     /* Calendar View */
     .calendar-container { padding: 20px; }
     .calendar-header {
@@ -254,15 +336,100 @@
     <header class="header">
       <div class="logo">✦ Epic Recovery</div>
       <div class="header-right">
-        <button class="header-btn primary" onclick="signIn()">Sign In with Google</button>
+        <button class="header-btn" onclick="showView('pricing')">Pricing</button>
+        <button class="header-btn primary" onclick="signIn()">Staff Login</button>
       </div>
     </header>
     
     <section class="hero">
       <h1><span>Epic</span> Recovery</h1>
       <p>Red light therapy at the pickleball courts. 15-minute sessions that boost recovery, reduce inflammation, and get you back in the game.</p>
-      <button class="hero-btn" onclick="signIn()">Get Started</button>
+      <button class="hero-btn" onclick="showView('pricing')">View Pricing</button>
     </section>
+    
+    <section class="benefits">
+      <div class="benefit-card">
+        <div class="benefit-icon">⚡</div>
+        <h3>Faster Recovery</h3>
+        <p>Reduce muscle soreness after your pickleball matches</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">🔥</div>
+        <h3>Reduce Inflammation</h3>
+        <p>Clinically proven to decrease joint pain and swelling</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">✨</div>
+        <h3>Skin Health</h3>
+        <p>Boost collagen production for healthier, younger-looking skin</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">😴</div>
+        <h3>Better Sleep</h3>
+        <p>Regulate circadian rhythm and improve sleep quality</p>
+      </div>
+    </section>
+  </div>
+  
+  <!-- PRICING VIEW -->
+  <div id="pricing" class="view">
+    <header class="header">
+      <div class="logo" onclick="showView('landing')" style="cursor:pointer">✦ Epic Recovery</div>
+      <div class="header-right">
+        <button class="header-btn primary" onclick="signIn()">Staff Login</button>
+      </div>
+    </header>
+    
+    <section class="pricing-header">
+      <h1>Simple Pricing</h1>
+      <p>Choose what works for you</p>
+    </section>
+    
+    <section class="pricing-grid">
+      <div class="price-card">
+        <h2>Drop-In</h2>
+        <div class="price">$9.99 <span>/ session</span></div>
+        <div class="desc">Register for member pricing</div>
+        <ul class="tier-features">
+          <li>15-minute session</li>
+          <li>Any available pod</li>
+          <li>No commitment</li>
+        </ul>
+        <button onclick="alert('Coming soon! For now, book at the front desk.')">Book Now</button>
+        <p style="margin-top:12px; font-size:12px; color:#888;">$14.99 without registration</p>
+      </div>
+      
+      <div class="price-card featured">
+        <span class="badge">Most Popular</span>
+        <h2>Limited</h2>
+        <div class="price">$99 <span>/ month</span></div>
+        <div class="desc">10 sessions per month</div>
+        <ul class="tier-features">
+          <li>Save $0.90/session</li>
+          <li>Priority booking</li>
+          <li>Rollover unused sessions</li>
+          <li>Cancel anytime</li>
+        </ul>
+        <button onclick="alert('Coming soon! For now, sign up at the front desk.')">Get Started</button>
+      </div>
+      
+      <div class="price-card">
+        <h2>Max</h2>
+        <div class="price">$220 <span>/ month</span></div>
+        <div class="desc">22 sessions per month</div>
+        <ul class="tier-features">
+          <li>Best value - $10/session</li>
+          <li>Daily sessions available</li>
+          <li>Priority booking</li>
+          <li>Bring a friend 1x/month</li>
+        </ul>
+        <button onclick="alert('Coming soon! For now, sign up at the front desk.')">Get Started</button>
+      </div>
+    </section>
+    
+    <div class="epic-link">
+      Epic Fitness member? <a href="#" onclick="alert('Contact front desk for Epic member discount!')">Click here for special pricing</a>
+    </div>
   </div>
 
   <!-- SCHEDULE VIEW -->
