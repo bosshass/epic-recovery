@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Epic Recovery</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; }
+    
+    .view { display: none; }
+    .view.active { display: block; }
+    
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: #111;
+      border-bottom: 1px solid #222;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo { font-size: 20px; font-weight: 700; color: #ff6b6b; cursor: pointer; }
+    .header-right { display: flex; gap: 12px; align-items: center; }
+    .header-btn {
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid #333;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .header-btn:hover { background: #1a1a1a; }
+    .header-btn.primary { background: #ff6b6b; border-color: #ff6b6b; }
+    .user-badge { color: #888; font-size: 14px; }
+    
+    /* Landing */
+    .hero {
+      text-align: center;
+      padding: 80px 20px;
+      background: linear-gradient(180deg, #1a0a0a 0%, #0a0a0a 100%);
+    }
+    .hero h1 { font-size: 48px; margin-bottom: 16px; }
+    .hero h1 span { color: #ff6b6b; }
+    .hero p { font-size: 20px; color: #888; max-width: 600px; margin: 0 auto 32px; }
+    .hero-btn {
+      padding: 16px 32px;
+      font-size: 18px;
+      background: #ff6b6b;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .hero-btn:hover { background: #ff5252; }
+    
+    /* Calendar View */
+    .calendar-container { padding: 20px; }
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .calendar-header h1 { font-size: 24px; }
+    .week-nav { display: flex; gap: 8px; align-items: center; }
+    .week-nav button {
+      padding: 8px 12px;
+      background: #222;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+    }
+    .week-nav button:hover { background: #333; }
+    .week-nav span { padding: 0 12px; min-width: 180px; text-align: center; }
+    
+    /* Calendar Grid */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: 70px repeat(5, 1fr);
+      gap: 1px;
+      background: #222;
+      border: 1px solid #222;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .cal-header {
+      background: #1a1a1a;
+      padding: 12px 8px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .cal-header.time-col { background: #111; }
+    .cal-header .pod-name { color: #ff6b6b; }
+    
+    .time-label {
+      background: #111;
+      padding: 8px 4px;
+      text-align: right;
+      font-size: 11px;
+      color: #666;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    
+    .cal-slot {
+      background: #111;
+      padding: 4px;
+      min-height: 44px;
+      cursor: pointer;
+      border-bottom: 1px solid #1a1a1a;
+      transition: background 0.1s;
+      position: relative;
+    }
+    .cal-slot:hover { background: #1a1a1a; }
+    .cal-slot.booked { cursor: default; }
+    .cal-slot.booked:hover { background: #111; }
+    
+    .booking-chip {
+      background: #2a2a2a;
+      border-left: 3px solid #ff6b6b;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 11px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .booking-chip.first-timer { border-left-color: #ff8e53; background: #2a2a1a; }
+    
+    /* Loading */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px;
+      color: #888;
+    }
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid #333;
+      border-top-color: #ff6b6b;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 16px;
+      padding: 32px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .modal h2 { margin-bottom: 8px; }
+    .modal p { color: #888; margin-bottom: 24px; }
+    .modal input {
+      width: 100%;
+      padding: 14px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+    .modal input:focus { outline: none; border-color: #ff6b6b; }
+    .modal button {
+      width: 100%;
+      padding: 14px;
+      background: #ff6b6b;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .modal button:hover { background: #ff5252; }
+    .modal button.secondary { background: #333; }
+    
+    /* Config Panel */
+    .config-panel {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px;
+    }
+    .config-panel h3 { margin-bottom: 16px; }
+    .config-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    .config-row label { width: 60px; color: #888; font-size: 14px; }
+    .config-row input {
+      flex: 1;
+      padding: 10px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 13px;
+    }
+    .config-row input:focus { outline: none; border-color: #ff6b6b; }
+    .config-note { font-size: 12px; color: #666; margin-top: 12px; }
+    
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 300;
+      display: none;
+    }
+    .toast.success { background: #065f46; }
+    .toast.error { background: #991b1b; }
+    .toast.active { display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- LANDING VIEW -->
+  <div id="landing" class="view active">
+    <header class="header">
+      <div class="logo">✦ Epic Recovery</div>
+      <div class="header-right">
+        <button class="header-btn primary" onclick="signIn()">Sign In with Google</button>
+      </div>
+    </header>
+    
+    <section class="hero">
+      <h1><span>Epic</span> Recovery</h1>
+      <p>Red light therapy at the pickleball courts. 15-minute sessions that boost recovery, reduce inflammation, and get you back in the game.</p>
+      <button class="hero-btn" onclick="signIn()">Get Started</button>
+    </section>
+  </div>
+
+  <!-- SCHEDULE VIEW -->
+  <div id="schedule" class="view">
+    <header class="header">
+      <div class="logo" onclick="signOut()">✦ Epic Recovery</div>
+      <div class="header-right">
+        <button class="header-btn" onclick="showView('schedule')" style="background:#ff6b6b; border-color:#ff6b6b;">Schedule</button>
+        <button class="header-btn" onclick="showView('admin')">Admin</button>
+        <button class="header-btn" onclick="showConfig()">⚙️</button>
+        <span class="user-badge" id="user-email"></span>
+        <button class="header-btn" onclick="signOut()">Sign Out</button>
+      </div>
+    </header>
+    
+    <!-- Calendar Config Panel -->
+    <div class="config-panel" id="config-panel" style="display:none;">
+      <h3>Pod Calendar IDs</h3>
+      <p style="color:#888; font-size:13px; margin-bottom:16px;">
+        Paste Google Calendar IDs for each pod. Find these in Calendar Settings → Integrate calendar.
+      </p>
+      <div class="config-row">
+        <label>Pod 1</label>
+        <input type="text" id="cal-pod1" placeholder="calendar-id@group.calendar.google.com">
+      </div>
+      <div class="config-row">
+        <label>Pod 2</label>
+        <input type="text" id="cal-pod2" placeholder="calendar-id@group.calendar.google.com">
+      </div>
+      <div class="config-row">
+        <label>Pod 3</label>
+        <input type="text" id="cal-pod3" placeholder="calendar-id@group.calendar.google.com">
+      </div>
+      <div class="config-row">
+        <label>Pod 4</label>
+        <input type="text" id="cal-pod4" placeholder="calendar-id@group.calendar.google.com">
+      </div>
+      <div class="config-row">
+        <label>Pod 5</label>
+        <input type="text" id="cal-pod5" placeholder="calendar-id@group.calendar.google.com">
+      </div>
+      <div class="config-row">
+        <label>Admin</label>
+        <input type="text" id="cal-admin" placeholder="admin-availability@group.calendar.google.com">
+      </div>
+      <button onclick="saveCalendars()" style="margin-top:16px; padding:12px 24px; background:#ff6b6b; border:none; border-radius:6px; color:#fff; cursor:pointer; font-weight:600;">
+        Save & Load Calendars
+      </button>
+      <p class="config-note">
+        Tip: Use "primary" to use your main Google Calendar for testing.
+      </p>
+    </div>
+    
+    <section class="calendar-container">
+      <div class="calendar-header">
+        <h1>Schedule</h1>
+        <div class="week-nav">
+          <button onclick="prevWeek()">‹ Prev</button>
+          <span id="week-label">Loading...</span>
+          <button onclick="nextWeek()">Next ›</button>
+        </div>
+      </div>
+      
+      <div id="calendar-loading" class="loading">
+        <div class="spinner"></div>
+        Configure calendars to get started
+      </div>
+      
+      <div class="calendar-grid" id="calendar-grid" style="display:none;"></div>
+    </section>
+  </div>
+
+  <!-- ADMIN VIEW -->
+  <div id="admin" class="view">
+    <header class="header">
+      <div class="logo" onclick="signOut()">✦ Epic Recovery</div>
+      <div class="header-right">
+        <button class="header-btn" onclick="showView('schedule')">Schedule</button>
+        <button class="header-btn" style="background:#ff6b6b; border-color:#ff6b6b;">Admin</button>
+        <button class="header-btn" onclick="showView('schedule'); setTimeout(showConfig, 100);">⚙️</button>
+        <span class="user-badge" id="user-email-admin"></span>
+        <button class="header-btn" onclick="signOut()">Sign Out</button>
+      </div>
+    </header>
+    
+    <div style="padding:20px; max-width:600px; margin:0 auto;">
+      <h2 style="margin-bottom:20px;">Quick Check-In</h2>
+      
+      <div style="background:#111; border:1px solid #222; border-radius:12px; padding:24px; margin-bottom:20px; text-align:center;">
+        <div style="font-size:48px; margin-bottom:12px;">📱</div>
+        <p style="color:#888;">QR Scanner coming soon</p>
+      </div>
+      
+      <h3 style="margin-bottom:12px; color:#888; font-size:14px; text-transform:uppercase;">Today's Bookings</h3>
+      <div id="today-bookings" style="background:#111; border:1px solid #222; border-radius:12px; padding:20px;">
+        <p style="color:#888; text-align:center;">Loading...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOOKING MODAL -->
+  <div class="modal-overlay" id="book-modal">
+    <div class="modal">
+      <h2>Book Session</h2>
+      <p id="book-details"></p>
+      <input type="text" id="book-name" placeholder="Customer name">
+      <input type="tel" id="book-phone" placeholder="Phone (optional)">
+      <label style="display:flex; align-items:center; gap:8px; margin:12px 0; color:#888; font-size:14px;">
+        <input type="checkbox" id="book-firsttimer"> First-time customer
+      </label>
+      <button onclick="confirmBooking()">Book Session</button>
+      <button class="secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ============================================
+    // CONFIG
+    // ============================================
+    const GOOGLE_CLIENT_ID = '659209157070-3s3bv41dqh6hbe9u3b46rm7emrsugsv6.apps.googleusercontent.com';
+    const SCOPES = 'https://www.googleapis.com/auth/calendar';
+    
+    // ============================================
+    // STATE
+    // ============================================
+    let accessToken = null;
+    let userEmail = null;
+    let currentWeekStart = getMonday(new Date());
+    let calendars = { pod1: '', pod2: '', pod3: '', pod4: '', pod5: '', admin: '' };
+    let events = { pod1: [], pod2: [], pod3: [], pod4: [], pod5: [] };
+    let pendingBooking = null;
+    
+    // ============================================
+    // AUTH
+    // ============================================
+    function signIn() {
+      const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+      authUrl.searchParams.set('client_id', GOOGLE_CLIENT_ID);
+      authUrl.searchParams.set('redirect_uri', window.location.origin + window.location.pathname);
+      authUrl.searchParams.set('response_type', 'token');
+      authUrl.searchParams.set('scope', SCOPES);
+      authUrl.searchParams.set('prompt', 'select_account');
+      window.location.href = authUrl.toString();
+    }
+    
+    function signOut() {
+      accessToken = null;
+      userEmail = null;
+      localStorage.removeItem('epic_token');
+      localStorage.removeItem('epic_email');
+      localStorage.removeItem('epic_expiry');
+      showView('landing');
+    }
+    
+    function handleAuthCallback() {
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      
+      if (params.has('access_token')) {
+        accessToken = params.get('access_token');
+        const expiresIn = parseInt(params.get('expires_in')) || 3600;
+        const expiry = new Date(Date.now() + expiresIn * 1000);
+        
+        localStorage.setItem('epic_token', accessToken);
+        localStorage.setItem('epic_expiry', expiry.toISOString());
+        
+        // Clear hash from URL
+        history.replaceState(null, '', window.location.pathname);
+        
+        // Get user info
+        fetchUserInfo();
+      }
+    }
+    
+    async function fetchUserInfo() {
+      try {
+        const res = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        const data = await res.json();
+        userEmail = data.email;
+        localStorage.setItem('epic_email', userEmail);
+        document.getElementById('user-email').textContent = userEmail;
+        document.getElementById('user-email-admin').textContent = userEmail;
+        showView('schedule');
+        loadSavedCalendars();
+      } catch (err) {
+        console.error('Failed to get user info:', err);
+        showToast('Auth failed', 'error');
+      }
+    }
+    
+    function checkStoredAuth() {
+      const storedToken = localStorage.getItem('epic_token');
+      const storedExpiry = localStorage.getItem('epic_expiry');
+      const storedEmail = localStorage.getItem('epic_email');
+      
+      if (storedToken && storedExpiry && new Date(storedExpiry) > new Date()) {
+        accessToken = storedToken;
+        userEmail = storedEmail;
+        document.getElementById('user-email').textContent = userEmail;
+        document.getElementById('user-email-admin').textContent = userEmail;
+        showView('schedule');
+        loadSavedCalendars();
+        return true;
+      }
+      return false;
+    }
+    
+    // ============================================
+    // CALENDAR CONFIG
+    // ============================================
+    function showConfig() {
+      const panel = document.getElementById('config-panel');
+      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
+    
+    function loadSavedCalendars() {
+      // Always reset to current week on load
+      currentWeekStart = getMonday(new Date());
+      
+      const saved = localStorage.getItem('epic_calendars');
+      if (saved) {
+        calendars = JSON.parse(saved);
+        document.getElementById('cal-pod1').value = calendars.pod1 || '';
+        document.getElementById('cal-pod2').value = calendars.pod2 || '';
+        document.getElementById('cal-pod3').value = calendars.pod3 || '';
+        document.getElementById('cal-pod4').value = calendars.pod4 || '';
+        document.getElementById('cal-pod5').value = calendars.pod5 || '';
+        document.getElementById('cal-admin').value = calendars.admin || '';
+        
+        if (calendars.pod1 || calendars.pod2) {
+          fetchAllCalendars();
+        }
+      }
+    }
+    
+    function saveCalendars() {
+      calendars.pod1 = document.getElementById('cal-pod1').value.trim();
+      calendars.pod2 = document.getElementById('cal-pod2').value.trim();
+      calendars.pod3 = document.getElementById('cal-pod3').value.trim();
+      calendars.pod4 = document.getElementById('cal-pod4').value.trim();
+      calendars.pod5 = document.getElementById('cal-pod5').value.trim();
+      calendars.admin = document.getElementById('cal-admin').value.trim();
+      
+      localStorage.setItem('epic_calendars', JSON.stringify(calendars));
+      showToast('Calendars saved!', 'success');
+      document.getElementById('config-panel').style.display = 'none';
+      fetchAllCalendars();
+    }
+    
+    // ============================================
+    // CALENDAR DATA
+    // ============================================
+    async function fetchAllCalendars() {
+      document.getElementById('calendar-loading').style.display = 'flex';
+      document.getElementById('calendar-loading').innerHTML = '<div class="spinner"></div> Loading calendars...';
+      document.getElementById('calendar-grid').style.display = 'none';
+      
+      const weekEnd = new Date(currentWeekStart);
+      weekEnd.setDate(weekEnd.getDate() + 7);
+      
+      const timeMin = currentWeekStart.toISOString();
+      const timeMax = weekEnd.toISOString();
+      
+      const pods = ['pod1', 'pod2', 'pod3', 'pod4', 'pod5'];
+      
+      for (const pod of pods) {
+        if (calendars[pod]) {
+          events[pod] = await fetchCalendarEvents(calendars[pod], timeMin, timeMax);
+        } else {
+          events[pod] = [];
+        }
+      }
+      
+      document.getElementById('calendar-loading').style.display = 'none';
+      document.getElementById('calendar-grid').style.display = 'grid';
+      renderCalendar();
+    }
+    
+    async function fetchCalendarEvents(calendarId, timeMin, timeMax) {
+      try {
+        const url = new URL(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`);
+        url.searchParams.set('timeMin', timeMin);
+        url.searchParams.set('timeMax', timeMax);
+        url.searchParams.set('singleEvents', 'true');
+        url.searchParams.set('orderBy', 'startTime');
+        
+        const res = await fetch(url, {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        
+        if (!res.ok) {
+          console.error(`Failed to fetch ${calendarId}:`, res.status);
+          return [];
+        }
+        
+        const data = await res.json();
+        return data.items || [];
+      } catch (err) {
+        console.error(`Error fetching ${calendarId}:`, err);
+        return [];
+      }
+    }
+    
+    // ============================================
+    // RENDER CALENDAR
+    // ============================================
+    function renderCalendar() {
+      updateWeekLabel();
+      
+      const grid = document.getElementById('calendar-grid');
+      grid.innerHTML = '';
+      
+      // Days of week (Mon-Fri)
+      const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+      
+      // Header row - Time + 5 days
+      grid.innerHTML += '<div class="cal-header time-col"></div>';
+      for (let d = 0; d < 5; d++) {
+        const dayDate = new Date(currentWeekStart);
+        dayDate.setDate(dayDate.getDate() + d);
+        const dayNum = dayDate.getDate();
+        const monthName = dayDate.toLocaleDateString('en-US', { month: 'short' });
+        grid.innerHTML += `
+          <div class="cal-header">
+            <div class="pod-name">${days[d]}</div>
+            <div style="font-size:11px; color:#888; font-weight:normal;">
+              ${monthName} ${dayNum}
+            </div>
+          </div>
+        `;
+      }
+      
+      // Time slots (9 AM to 5 PM, 15-min intervals)
+      const times = [];
+      for (let h = 9; h < 17; h++) {
+        for (let m = 0; m < 60; m += 15) {
+          times.push({ hour: h, minute: m });
+        }
+      }
+      
+      times.forEach(({ hour, minute }) => {
+        const timeStr = formatTimeLabel(hour, minute);
+        grid.innerHTML += `<div class="time-label">${timeStr}</div>`;
+        
+        // For each day Mon-Fri
+        for (let d = 0; d < 5; d++) {
+          const slotDate = new Date(currentWeekStart);
+          slotDate.setDate(slotDate.getDate() + d);
+          slotDate.setHours(hour, minute, 0, 0);
+          
+          const slotEnd = new Date(slotDate);
+          slotEnd.setMinutes(slotEnd.getMinutes() + 15);
+          
+          // Find bookings across ALL pods for this time slot
+          const bookingsAtTime = [];
+          for (let pod = 1; pod <= 5; pod++) {
+            const booking = findBooking(`pod${pod}`, slotDate, slotEnd);
+            if (booking) {
+              bookingsAtTime.push({ pod, booking });
+            }
+          }
+          
+          // Find first available pod
+          const availablePod = findAvailablePod(slotDate, slotEnd);
+          
+          if (bookingsAtTime.length >= 5) {
+            // All pods booked
+            grid.innerHTML += `
+              <div class="cal-slot booked">
+                <div class="booking-chip">FULL</div>
+              </div>
+            `;
+          } else if (bookingsAtTime.length > 0) {
+            // Some pods booked - show count + clickable
+            const firstBooking = bookingsAtTime[0].booking;
+            const isFirstTimer = firstBooking.summary?.toLowerCase().includes('first') || 
+                                 firstBooking.summary?.toLowerCase().includes('🆕');
+            grid.innerHTML += `
+              <div class="cal-slot" onclick="openBookingModal(${availablePod}, '${slotDate.toISOString()}')" style="position:relative;">
+                <div class="booking-chip ${isFirstTimer ? 'first-timer' : ''}" style="font-size:10px;">
+                  ${bookingsAtTime.length}/5 booked
+                </div>
+              </div>
+            `;
+          } else {
+            // All open
+            grid.innerHTML += `
+              <div class="cal-slot" onclick="openBookingModal(${availablePod}, '${slotDate.toISOString()}')"></div>
+            `;
+          }
+        }
+      });
+    }
+    
+    function findAvailablePod(slotStart, slotEnd) {
+      for (let pod = 1; pod <= 5; pod++) {
+        if (!calendars[`pod${pod}`]) continue;
+        const booking = findBooking(`pod${pod}`, slotStart, slotEnd);
+        if (!booking) return pod;
+      }
+      return 1; // fallback
+    }
+    
+    function findBooking(pod, slotStart, slotEnd) {
+      return events[pod].find(event => {
+        const eventStart = new Date(event.start.dateTime || event.start.date);
+        const eventEnd = new Date(event.end.dateTime || event.end.date);
+        return eventStart < slotEnd && eventEnd > slotStart;
+      });
+    }
+    
+    // ============================================
+    // BOOKING
+    // ============================================
+    function openBookingModal(pod, startTime) {
+      if (!calendars[`pod${pod}`]) {
+        showToast('Configure Pod ' + pod + ' calendar first', 'error');
+        return;
+      }
+      
+      const start = new Date(startTime);
+      pendingBooking = { pod, start };
+      
+      document.getElementById('book-details').textContent = 
+        `${formatDate(start)} @ ${formatTimeLabel(start.getHours(), start.getMinutes())} • Pod ${pod}`;
+      document.getElementById('book-name').value = '';
+      document.getElementById('book-phone').value = '';
+      document.getElementById('book-firsttimer').checked = false;
+      
+      document.getElementById('book-modal').classList.add('active');
+    }
+    
+    function closeModal() {
+      document.getElementById('book-modal').classList.remove('active');
+      pendingBooking = null;
+    }
+    
+    async function confirmBooking() {
+      if (!pendingBooking) return;
+      
+      const name = document.getElementById('book-name').value.trim();
+      if (!name) {
+        showToast('Enter customer name', 'error');
+        return;
+      }
+      
+      const phone = document.getElementById('book-phone').value.trim();
+      const isFirstTimer = document.getElementById('book-firsttimer').checked;
+      
+      const { pod, start } = pendingBooking;
+      const end = new Date(start);
+      end.setMinutes(end.getMinutes() + 15);
+      
+      const calendarId = calendars[`pod${pod}`];
+      
+      const event = {
+        summary: isFirstTimer ? `🆕 ${name}` : name,
+        description: [
+          phone ? `Phone: ${phone}` : '',
+          isFirstTimer ? 'First Timer - Requires orientation' : ''
+        ].filter(Boolean).join('\n'),
+        start: { dateTime: start.toISOString(), timeZone: 'America/Denver' },
+        end: { dateTime: end.toISOString(), timeZone: 'America/Denver' }
+      };
+      
+      try {
+        const res = await fetch(
+          `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`,
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(event)
+          }
+        );
+        
+        if (!res.ok) {
+          throw new Error('Failed to create event');
+        }
+        
+        showToast('Booking created!', 'success');
+        closeModal();
+        fetchAllCalendars(); // Refresh
+      } catch (err) {
+        console.error('Booking failed:', err);
+        showToast('Booking failed - check calendar permissions', 'error');
+      }
+    }
+    
+    // ============================================
+    // WEEK NAVIGATION
+    // ============================================
+    function getMonday(date) {
+      const d = new Date(date);
+      const day = d.getDay();
+      const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+      d.setDate(diff);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    }
+    
+    function prevWeek() {
+      currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+      fetchAllCalendars();
+    }
+    
+    function nextWeek() {
+      currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+      fetchAllCalendars();
+    }
+    
+    function updateWeekLabel() {
+      const end = new Date(currentWeekStart);
+      end.setDate(end.getDate() + 6);
+      
+      const opts = { month: 'short', day: 'numeric' };
+      const startStr = currentWeekStart.toLocaleDateString('en-US', opts);
+      const endStr = end.toLocaleDateString('en-US', { ...opts, year: 'numeric' });
+      
+      document.getElementById('week-label').textContent = `${startStr} - ${endStr}`;
+    }
+    
+    // ============================================
+    // HELPERS
+    // ============================================
+    function showView(viewId) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById(viewId).classList.add('active');
+      
+      if (viewId === 'admin') {
+        loadTodayBookings();
+      }
+    }
+    
+    function loadTodayBookings() {
+      const container = document.getElementById('today-bookings');
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      let allBookings = [];
+      for (let pod = 1; pod <= 5; pod++) {
+        events[`pod${pod}`].forEach(event => {
+          const start = new Date(event.start.dateTime || event.start.date);
+          if (start >= today && start < tomorrow) {
+            allBookings.push({ pod, event, start });
+          }
+        });
+      }
+      
+      allBookings.sort((a, b) => a.start - b.start);
+      
+      if (allBookings.length === 0) {
+        container.innerHTML = '<p style="color:#888; text-align:center;">No bookings today</p>';
+        return;
+      }
+      
+      container.innerHTML = allBookings.map(({ pod, event, start }) => {
+        const time = formatTimeLabel(start.getHours(), start.getMinutes());
+        const isFirstTimer = event.summary?.includes('🆕');
+        return `
+          <div style="display:flex; align-items:center; padding:12px 0; border-bottom:1px solid #222;">
+            <div style="width:70px; color:#888; font-size:14px;">${time}</div>
+            <div style="flex:1;">
+              <div style="font-weight:600;">${event.summary || 'Booked'}</div>
+              <div style="font-size:12px; color:#888;">Pod ${pod}</div>
+            </div>
+            ${isFirstTimer ? '<span style="background:#ff8e53; padding:4px 8px; border-radius:4px; font-size:11px;">1st Time</span>' : ''}
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function formatTimeLabel(hour, minute) {
+      const h = hour > 12 ? hour - 12 : hour;
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const m = minute.toString().padStart(2, '0');
+      return `${h}:${m} ${ampm}`;
+    }
+    
+    function formatDate(date) {
+      return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    }
+    
+    function showToast(message, type = '') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast active ' + type;
+      setTimeout(() => toast.classList.remove('active'), 3000);
+    }
+    
+    // ============================================
+    // INIT
+    // ============================================
+    window.onload = function() {
+      // Check for OAuth callback
+      if (window.location.hash.includes('access_token')) {
+        handleAuthCallback();
+      } else if (!checkStoredAuth()) {
+        showView('landing');
+      }
+    };
+  </script>
+
+</body>
+</html>
