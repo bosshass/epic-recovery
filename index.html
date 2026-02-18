@@ -727,10 +727,10 @@
 
   <!-- MEMBER BOOKING MODAL -->
   <div class="modal-overlay" id="member-book-modal">
-    <div class="modal" style="max-width:440px;">
+    <div class="modal" style="max-width:440px; max-height:85vh; display:flex; flex-direction:column;">
       <h2>Book a Session</h2>
       <p id="member-book-credits" style="color:#ff6b6b; font-weight:600;"></p>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:16px 0; text-align:left;">
+      <div style="overflow-y:auto; flex:1; margin:12px 0; padding-right:4px;">
         <div id="member-slot-grid"></div>
       </div>
       <p id="member-book-selected" style="color:#ff6b6b; font-size:14px; min-height:20px;"></p>
