@@ -141,6 +141,130 @@
     }
     .epic-link a { color: #ff6b6b; cursor: pointer; }
     
+    /* Member Dashboard */
+    .dashboard { padding: 20px; max-width: 500px; margin: 0 auto; }
+    .welcome-card {
+      background: linear-gradient(135deg, #1a1111, #111);
+      border: 1px solid #333;
+      border-radius: 16px;
+      padding: 32px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .welcome-card h1 { font-size: 24px; margin-bottom: 8px; }
+    .membership-badge {
+      display: inline-block;
+      background: #ff6b6b;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .credits-ring {
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 12px;
+      position: relative;
+    }
+    .credits-ring svg { transform: rotate(-90deg); }
+    .credits-ring .ring-bg { fill: none; stroke: #222; stroke-width: 8; }
+    .credits-ring .ring-fill { fill: none; stroke: #ff6b6b; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.8s ease; }
+    .credits-ring .ring-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    .credits-ring .credits-num { font-size: 48px; font-weight: 700; color: #ff6b6b; display: block; line-height: 1; }
+    .credits-ring .credits-label { font-size: 12px; color: #888; }
+    .credits-header-badge {
+      background: #2a1a1a;
+      border: 1px solid #ff6b6b;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      color: #ff6b6b;
+      font-weight: 600;
+    }
+    .action-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .action-card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 24px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .action-card:hover { border-color: #ff6b6b; }
+    .action-card .icon { font-size: 32px; margin-bottom: 8px; }
+    .action-card h3 { font-size: 15px; margin-bottom: 4px; }
+    .action-card p { font-size: 12px; color: #888; }
+    .upcoming-section { margin-bottom: 20px; }
+    .upcoming-section h2 { font-size: 14px; color: #888; text-transform: uppercase; margin-bottom: 12px; }
+    .upcoming-card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .upcoming-card .date { font-weight: 600; font-size: 16px; }
+    .upcoming-card .time { color: #ff6b6b; font-size: 14px; }
+    .upcoming-card .pod { color: #888; font-size: 13px; }
+    .upcoming-card button {
+      padding: 8px 16px;
+      background: #222;
+      border: 1px solid #333;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .upcoming-card button:hover { background: #333; }
+    .empty-upcoming {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 32px;
+      text-align: center;
+      color: #888;
+    }
+    .visit-history { margin-bottom: 20px; }
+    .visit-history h2 { font-size: 14px; color: #888; text-transform: uppercase; margin-bottom: 12px; }
+    .visit-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    .visit-item .visit-date { font-size: 14px; }
+    .visit-item .visit-pod { font-size: 12px; color: #888; }
+    .visit-item .visit-status { font-size: 12px; color: #4ade80; }
+
+    /* Member Login Modal */
+    .member-form input {
+      width: 100%;
+      padding: 14px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+    .member-form input:focus { outline: none; border-color: #ff6b6b; }
+
     /* Calendar View */
     .calendar-container { padding: 20px; }
     .calendar-header {
@@ -337,6 +461,7 @@
       <div class="logo">✦ Epic Recovery</div>
       <div class="header-right">
         <button class="header-btn" onclick="showView('pricing')">Pricing</button>
+        <button class="header-btn" onclick="showMemberLogin()">Member Login</button>
         <button class="header-btn primary" onclick="signIn()">Staff Login</button>
       </div>
     </header>
@@ -376,6 +501,7 @@
     <header class="header">
       <div class="logo" onclick="showView('landing')" style="cursor:pointer">✦ Epic Recovery</div>
       <div class="header-right">
+        <button class="header-btn" onclick="showMemberLogin()">Member Login</button>
         <button class="header-btn primary" onclick="signIn()">Staff Login</button>
       </div>
     </header>
@@ -527,6 +653,89 @@
       <div id="today-bookings" style="background:#111; border:1px solid #222; border-radius:12px; padding:20px;">
         <p style="color:#888; text-align:center;">Loading...</p>
       </div>
+    </div>
+  </div>
+
+  <!-- MEMBER DASHBOARD -->
+  <div id="dashboard" class="view">
+    <header class="header">
+      <div class="logo" onclick="showView('dashboard')">✦ Epic Recovery</div>
+      <div class="header-right">
+        <div class="credits-header-badge"><span id="header-credits">0</span> sessions left</div>
+        <button class="header-btn" onclick="memberSignOut()">Sign Out</button>
+      </div>
+    </header>
+    
+    <section class="dashboard">
+      <div class="welcome-card">
+        <h1 id="member-welcome">Hey! 👋</h1>
+        <div class="membership-badge" id="member-plan">Member</div>
+        <div class="credits-ring">
+          <svg width="160" height="160" viewBox="0 0 160 160">
+            <circle class="ring-bg" cx="80" cy="80" r="70"/>
+            <circle class="ring-fill" id="credits-ring-fill" cx="80" cy="80" r="70" 
+              stroke-dasharray="439.8" stroke-dashoffset="0"/>
+          </svg>
+          <div class="ring-text">
+            <span class="credits-num" id="dashboard-credits">0</span>
+            <span class="credits-label">sessions left</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="action-grid">
+        <div class="action-card" onclick="showMemberBooking()">
+          <div class="icon">📅</div>
+          <h3>Book Session</h3>
+          <p>Reserve your next slot</p>
+        </div>
+        <div class="action-card" onclick="showVisitHistory()">
+          <div class="icon">📜</div>
+          <h3>History</h3>
+          <p>View past sessions</p>
+        </div>
+      </div>
+      
+      <div class="upcoming-section">
+        <h2>Next Session</h2>
+        <div id="upcoming-container">
+          <div class="empty-upcoming">No upcoming sessions — book one!</div>
+        </div>
+      </div>
+
+      <div class="visit-history" id="history-section" style="display:none;">
+        <h2>Visit History</h2>
+        <div id="history-list"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- MEMBER LOGIN MODAL -->
+  <div class="modal-overlay" id="member-login-modal">
+    <div class="modal">
+      <h2>Member Login</h2>
+      <p>Enter your phone number or email</p>
+      <div class="member-form">
+        <input type="text" id="member-login-id" placeholder="Phone or email">
+        <input type="password" id="member-login-pin" placeholder="PIN (last 4 of phone)">
+      </div>
+      <button onclick="memberLogin()">Sign In</button>
+      <button class="secondary" onclick="closeMemberLogin()" style="margin-top:8px;">Cancel</button>
+      <p style="margin-top:16px; font-size:12px; color:#666;">Demo: use any name + PIN 1234</p>
+    </div>
+  </div>
+
+  <!-- MEMBER BOOKING MODAL -->
+  <div class="modal-overlay" id="member-book-modal">
+    <div class="modal" style="max-width:440px;">
+      <h2>Book a Session</h2>
+      <p id="member-book-credits" style="color:#ff6b6b; font-weight:600;"></p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:16px 0; text-align:left;">
+        <div id="member-slot-grid"></div>
+      </div>
+      <p id="member-book-selected" style="color:#ff6b6b; font-size:14px; min-height:20px;"></p>
+      <button onclick="confirmMemberBooking()">Confirm Booking</button>
+      <button class="secondary" onclick="closeMemberBooking()" style="margin-top:8px;">Cancel</button>
     </div>
   </div>
 
@@ -1030,12 +1239,332 @@
     }
     
     // ============================================
+    // MEMBER SYSTEM
+    // ============================================
+    let currentMember = null;
+    let selectedMemberSlot = null;
+
+    // Demo member database (localStorage-backed)
+    function getMemberDB() {
+      const db = localStorage.getItem('epic_members');
+      return db ? JSON.parse(db) : {};
+    }
+
+    function saveMemberDB(db) {
+      localStorage.setItem('epic_members', JSON.stringify(db));
+    }
+
+    function showMemberLogin() {
+      document.getElementById('member-login-id').value = '';
+      document.getElementById('member-login-pin').value = '';
+      document.getElementById('member-login-modal').classList.add('active');
+    }
+
+    function closeMemberLogin() {
+      document.getElementById('member-login-modal').classList.remove('active');
+    }
+
+    function memberLogin() {
+      const loginId = document.getElementById('member-login-id').value.trim();
+      const pin = document.getElementById('member-login-pin').value.trim();
+      
+      if (!loginId) {
+        showToast('Enter your phone or email', 'error');
+        return;
+      }
+
+      const db = getMemberDB();
+      const key = loginId.toLowerCase();
+      
+      // Create or find member
+      if (!db[key]) {
+        // New demo member — auto-create with Limited plan
+        db[key] = {
+          name: loginId.includes('@') ? loginId.split('@')[0] : loginId,
+          plan: 'Limited',
+          totalCredits: 10,
+          creditsUsed: 0,
+          visits: [],
+          upcoming: [],
+          createdAt: new Date().toISOString()
+        };
+        saveMemberDB(db);
+        showToast('Welcome! Demo account created with 10 sessions.', 'success');
+      }
+      
+      currentMember = { id: key, ...db[key] };
+      localStorage.setItem('epic_current_member', key);
+      closeMemberLogin();
+      loadDashboard();
+      showView('dashboard');
+    }
+
+    function memberSignOut() {
+      currentMember = null;
+      localStorage.removeItem('epic_current_member');
+      showView('landing');
+    }
+
+    function checkMemberAuth() {
+      const memberId = localStorage.getItem('epic_current_member');
+      if (memberId) {
+        const db = getMemberDB();
+        if (db[memberId]) {
+          currentMember = { id: memberId, ...db[memberId] };
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function loadDashboard() {
+      if (!currentMember) return;
+      
+      const remaining = currentMember.totalCredits - currentMember.creditsUsed;
+      const pct = currentMember.totalCredits > 0 ? remaining / currentMember.totalCredits : 0;
+      const circumference = 2 * Math.PI * 70; // r=70
+      const offset = circumference * (1 - pct);
+      
+      // Update credits displays
+      document.getElementById('header-credits').textContent = remaining;
+      document.getElementById('dashboard-credits').textContent = remaining;
+      
+      // Animate ring
+      const ring = document.getElementById('credits-ring-fill');
+      ring.style.strokeDasharray = circumference;
+      ring.style.strokeDashoffset = offset;
+      
+      // Ring color based on remaining
+      if (remaining <= 2) {
+        ring.style.stroke = '#ef4444';
+      } else if (remaining <= 4) {
+        ring.style.stroke = '#f59e0b';
+      } else {
+        ring.style.stroke = '#ff6b6b';
+      }
+      
+      // Welcome text
+      const displayName = currentMember.name.charAt(0).toUpperCase() + currentMember.name.slice(1);
+      document.getElementById('member-welcome').textContent = `Hey, ${displayName}! 👋`;
+      document.getElementById('member-plan').textContent = `${currentMember.plan} Member`;
+      
+      // Upcoming session
+      loadUpcoming();
+      
+      // Hide history by default
+      document.getElementById('history-section').style.display = 'none';
+    }
+
+    function loadUpcoming() {
+      const container = document.getElementById('upcoming-container');
+      const upcoming = currentMember.upcoming || [];
+      const now = new Date();
+      
+      // Filter future only
+      const future = upcoming.filter(u => new Date(u.time) > now);
+      
+      if (future.length === 0) {
+        container.innerHTML = '<div class="empty-upcoming">No upcoming sessions — book one!</div>';
+        return;
+      }
+      
+      const next = future.sort((a, b) => new Date(a.time) - new Date(b.time))[0];
+      const dt = new Date(next.time);
+      const dateStr = dt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+      const timeStr = dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      
+      container.innerHTML = `
+        <div class="upcoming-card">
+          <div>
+            <div class="date">${dateStr}</div>
+            <div class="time">${timeStr}</div>
+            <div class="pod">Pod ${next.pod}</div>
+          </div>
+          <button onclick="cancelUpcoming('${next.time}')">Cancel</button>
+        </div>
+      `;
+    }
+
+    function cancelUpcoming(time) {
+      if (!currentMember) return;
+      const db = getMemberDB();
+      const member = db[currentMember.id];
+      
+      member.upcoming = (member.upcoming || []).filter(u => u.time !== time);
+      member.creditsUsed = Math.max(0, member.creditsUsed - 1);
+      
+      db[currentMember.id] = member;
+      saveMemberDB(db);
+      currentMember = { id: currentMember.id, ...member };
+      
+      showToast('Session cancelled, credit restored', 'success');
+      loadDashboard();
+    }
+
+    function showVisitHistory() {
+      const section = document.getElementById('history-section');
+      const list = document.getElementById('history-list');
+      const visits = currentMember.visits || [];
+      
+      if (section.style.display === 'block') {
+        section.style.display = 'none';
+        return;
+      }
+      
+      if (visits.length === 0) {
+        list.innerHTML = '<div class="empty-upcoming">No visits yet</div>';
+      } else {
+        list.innerHTML = visits.slice().reverse().map(v => {
+          const dt = new Date(v.time);
+          const dateStr = dt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+          const timeStr = dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+          return `
+            <div class="visit-item">
+              <div>
+                <div class="visit-date">${dateStr} @ ${timeStr}</div>
+                <div class="visit-pod">Pod ${v.pod}</div>
+              </div>
+              <div class="visit-status">✓ Completed</div>
+            </div>
+          `;
+        }).join('');
+      }
+      
+      section.style.display = 'block';
+    }
+
+    // Member booking
+    function showMemberBooking() {
+      if (!currentMember) return;
+      const remaining = currentMember.totalCredits - currentMember.creditsUsed;
+      
+      if (remaining <= 0) {
+        showToast('No sessions remaining — upgrade your plan!', 'error');
+        return;
+      }
+      
+      document.getElementById('member-book-credits').textContent = `${remaining} session${remaining !== 1 ? 's' : ''} remaining`;
+      selectedMemberSlot = null;
+      document.getElementById('member-book-selected').textContent = '';
+      
+      // Generate available slots for next 3 days
+      const grid = document.getElementById('member-slot-grid');
+      grid.style.display = 'grid';
+      grid.style.gridTemplateColumns = '1fr';
+      grid.style.gap = '8px';
+      
+      let html = '';
+      const now = new Date();
+      
+      for (let d = 0; d < 3; d++) {
+        const day = new Date(now);
+        day.setDate(day.getDate() + d + (day.getHours() >= 16 ? 1 : 0));
+        if (day.getDay() === 0) day.setDate(day.getDate() + 1);
+        if (day.getDay() === 6) day.setDate(day.getDate() + 2);
+        
+        const dayLabel = day.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        html += `<div style="font-size:13px; font-weight:600; color:#888; margin-top:8px;">${dayLabel}</div>`;
+        html += '<div style="display:flex; flex-wrap:wrap; gap:6px;">';
+        
+        for (let h = 9; h < 17; h++) {
+          for (let m = 0; m < 60; m += 30) {
+            const slotTime = new Date(day);
+            slotTime.setHours(h, m, 0, 0);
+            if (slotTime <= now) continue;
+            
+            const pod = Math.floor(Math.random() * 5) + 1;
+            const iso = slotTime.toISOString();
+            const label = slotTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            
+            html += `<button onclick="selectMemberSlot('${iso}', ${pod}, this)" 
+              style="padding:6px 10px; background:#1a1a1a; border:1px solid #333; border-radius:6px; color:#fff; cursor:pointer; font-size:12px;"
+              >${label}</button>`;
+          }
+        }
+        html += '</div>';
+      }
+      
+      grid.innerHTML = html;
+      document.getElementById('member-book-modal').classList.add('active');
+    }
+
+    function selectMemberSlot(iso, pod, el) {
+      selectedMemberSlot = { time: iso, pod };
+      const dt = new Date(iso);
+      const label = dt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) + 
+        ' @ ' + dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) + ` • Pod ${pod}`;
+      document.getElementById('member-book-selected').textContent = label;
+      
+      // Highlight selected
+      document.querySelectorAll('#member-slot-grid button').forEach(b => {
+        b.style.borderColor = '#333';
+        b.style.background = '#1a1a1a';
+      });
+      el.style.borderColor = '#ff6b6b';
+      el.style.background = '#2a1a1a';
+    }
+
+    function confirmMemberBooking() {
+      if (!selectedMemberSlot || !currentMember) {
+        showToast('Select a time slot', 'error');
+        return;
+      }
+      
+      const db = getMemberDB();
+      const member = db[currentMember.id];
+      const remaining = member.totalCredits - member.creditsUsed;
+      
+      if (remaining <= 0) {
+        showToast('No sessions remaining', 'error');
+        return;
+      }
+      
+      // Deduct credit and add to upcoming
+      member.creditsUsed += 1;
+      if (!member.upcoming) member.upcoming = [];
+      member.upcoming.push(selectedMemberSlot);
+      
+      // Also add to visits (simulating check-in)
+      if (!member.visits) member.visits = [];
+      member.visits.push(selectedMemberSlot);
+      
+      db[currentMember.id] = member;
+      saveMemberDB(db);
+      currentMember = { id: currentMember.id, ...member };
+      
+      closeMemberBooking();
+      showToast('Session booked!', 'success');
+      loadDashboard();
+    }
+
+    function closeMemberBooking() {
+      document.getElementById('member-book-modal').classList.remove('active');
+      selectedMemberSlot = null;
+    }
+
+    // Admin: simulate check-in (deduct credit)
+    function adminCheckIn(memberKey) {
+      const db = getMemberDB();
+      if (db[memberKey]) {
+        db[memberKey].creditsUsed += 1;
+        if (!db[memberKey].visits) db[memberKey].visits = [];
+        db[memberKey].visits.push({ time: new Date().toISOString(), pod: 1 });
+        saveMemberDB(db);
+        showToast('Checked in! Credit deducted.', 'success');
+      }
+    }
+
+    // ============================================
     // INIT
     // ============================================
     window.onload = function() {
-      // Check for OAuth callback
+      // Check for OAuth callback (staff)
       if (window.location.hash.includes('access_token')) {
         handleAuthCallback();
+      } else if (checkMemberAuth()) {
+        // Returning member
+        loadDashboard();
+        showView('dashboard');
       } else if (!checkStoredAuth()) {
         showView('landing');
       }
